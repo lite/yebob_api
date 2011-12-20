@@ -1,20 +1,21 @@
 require_relative 'spec_helper.rb'
 
 describe 'Yebob API' do
-	include Rack::Test::Methods	
+  include Rack::Test::Methods
 
-	# it "should load the home page" do
-	# 	get '/nonereal'
-	# 	last_response.should be_ok
-	# end
+  it "should return test string" do
+    get '/testsimple'
+    last_response.body.should == 'OK'
+  end
 
-	# it "should reverse posted values as well" do
-	# 	post '/', params = { :str => 'Jeff'}
-	# 	last_response.body.should == 'ffeJ'
-	# end
-
-	it "should return ranking list" do
-		get '/ranking', params = { :token => '123456789ABCDEF0'}
-		last_response.body.should == '1st'
-	end
+  it "should return json object" do
+    get '/testjson'
+    resp = { :key => 'value' }.to_json
+    last_response.body.should == resp
+  end
+  
+  it "should return ranking object" do
+    get '/ranking', params = { :token => '123456789ABCDEF0'}
+    last_response.body.should == fake_ranking_list.to_json
+  end
 end
