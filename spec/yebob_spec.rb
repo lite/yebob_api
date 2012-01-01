@@ -16,6 +16,12 @@ describe 'Yebob API' do
   
   it "should return ranking object" do
     get '/ranking', params = { :token => '123456789ABCDEF0'}
-    last_response.body.should == fake_ranking_list.to_json
+    last_response.body.should == fake_ranking.to_json
   end
+
+  it "should return games object" do
+    get '/games', params = { :token => '123456789ABCDEF0'}
+    last_response.body.should == fake_games.to_json
+  end
+
 end
