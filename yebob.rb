@@ -1,42 +1,50 @@
+require 'rubygems'
 require 'sinatra'
 require 'json'
+require 'data_mapper'
+
+# need install dm-sqlite-adapter
+DataMapper::setup(:default, "sqlite3://#{Dir.pwd}/yebob.db")
+
+class Score
+    include DataMapper::Resource
+    property :id, Serial
+	property :game_id, String
+    property :player, String
+    property :score, Integer
+    property :created_at, DateTime
+end
+
+# automatically create the post table
+Score.auto_migrate! unless Score.storage_exists?
 
 configure :development do 
   use Rack::Reloader 
 end
 
-# for test
-get '/testsimple' do
-  'OK'
-end
-
-get '/testjson' do
+get '/api/:game_id' do
   content_type :json
-  { :key => 'value' }.to_json
+  items = Score.all :limit => 10, 
+                    :game_id => params[:game_id]
+  items.to_json
 end
 
-# ranking
-def fake_ranking
-  [
-    { :name => 'yebob', :score => "100"},
-    { :name => 'anonymous', :score => "50"},
-  ]
+get '/show/:game_id' do 
+  @items = Score.all :limit => 10, 
+                      :game_id => params[:game_id]
+  erb :index
 end
 
-get '/ranking' do
-  content_type :json
-  fake_ranking.to_json
+get '/new' do 
+  erb :new
 end
 
-#games
-def fake_games
-  [
-    { :id => '1', :name => 'angry birds'},
-    { :id => '2', :name => 'fruits ninja'},
-  ]
-end
-
-get '/games' do
-  content_type :json
-  fake_games.to_json
+post '/api/create' do 
+  item = Score.new
+  item.game_id = params[:game_id]
+  item.player = params[:player]
+  item.score = params[:score].to_i
+  item.created_at = Time.now
+  item.save
+  redirect "/show/#{item.game_id}"
 end
