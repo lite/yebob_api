@@ -3,17 +3,17 @@ require 'sinatra'
 require 'json'
 require 'data_mapper'
 require 'omniauth'
-require 'openid/store/filesystem'
-  
+#require 'openid/store/filesystem'
+
 use Rack::Session::Cookie
-use OmniAuth::Builder do
-	provider :open_id, OpenID::Store::Filesystem.new('/tmp')
-	provider :twitter, 'consumerkey', 'consumersecret'
-end
+#use OmniAuth::Builder do
+#	provider :open_id, OpenID::Store::Filesystem.new('/tmp')
+#	provider :twitter, 'consumerkey', 'consumersecret'
+#end
 
 get '/' do
 	<<-HTML
-	<a href='/auth/twitter'>Sign in with Twitter</a>
+	<a href='/auth/twitter'>Sign in</a>
 
 	<form action='/auth/open_id' method='post'>
 	  <input type='text' name='identifier'/>
@@ -46,16 +46,18 @@ configure :development do
   use Rack::Reloader 
 end
 
-get '/api/:game_id' do
+get '/api/:gameId' do 
+  request.body.rewind  # in case someone already read it
+  puts request.body.read
   content_type :json
   items = Score.all :limit => 10, 
-                    :game_id => params[:game_id]
+                    :game_id => params[:gameId]
   items.to_json
 end
 
-get '/show/:game_id' do 
+get '/show/:gameId' do 
   @items = Score.all :limit => 10, 
-                      :game_id => params[:game_id]
+                      :game_id => params[:gameId]
   erb :index
 end
 
@@ -64,8 +66,10 @@ get '/new' do
 end
 
 post '/api/create' do 
+  request.body.rewind  # in case someone already read it
+  puts request.body.read
   item = Score.new
-  item.game_id = params[:game_id]
+  item.game_id = params[:gameId]
   item.player = params[:player]
   item.score = params[:score].to_i
   item.created_at = Time.now
