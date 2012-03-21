@@ -22,7 +22,8 @@ configure :development do
   use Rack::Reloader 
 end
 
-get '/access_token' do
+get '/login' do
+  'ret:400, msg:test'
 end
 
 get '/api/:gameId' do 
