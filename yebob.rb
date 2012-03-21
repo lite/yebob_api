@@ -2,30 +2,6 @@ require 'rubygems'
 require 'sinatra'
 require 'json'
 require 'data_mapper'
-require 'omniauth'
-#require 'openid/store/filesystem'
-
-use Rack::Session::Cookie
-#use OmniAuth::Builder do
-#	provider :open_id, OpenID::Store::Filesystem.new('/tmp')
-#	provider :twitter, 'consumerkey', 'consumersecret'
-#end
-
-get '/' do
-	<<-HTML
-	<a href='/auth/twitter'>Sign in</a>
-
-	<form action='/auth/open_id' method='post'>
-	  <input type='text' name='identifier'/>
-	  <input type='submit' value='Sign in with OpenID'/>
-	</form>
-	HTML
-end
-  
-post '/auth/:name/callback' do
-    auth = request.env['omniauth.auth']
-    # do whatever you want with the information!
-end
 
 # need install dm-sqlite-adapter
 DataMapper::setup(:default, "sqlite3://#{Dir.pwd}/yebob.db")
@@ -33,7 +9,7 @@ DataMapper::setup(:default, "sqlite3://#{Dir.pwd}/yebob.db")
 class Score
     include DataMapper::Resource
     property :id, Serial
-	property :game_id, String
+    property :game_id, String
     property :player, String
     property :score, Integer
     property :created_at, DateTime
@@ -44,6 +20,9 @@ Score.auto_migrate! unless Score.storage_exists?
 
 configure :development do 
   use Rack::Reloader 
+end
+
+get '/access_token' do
 end
 
 get '/api/:gameId' do 
