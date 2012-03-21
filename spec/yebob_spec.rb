@@ -10,14 +10,14 @@ describe 'Yebob API' do
   it "should login" do
     get "/login",:community=>"qq", :code=>"authcode", :state=>"ready", :redirect_url=>"/"
     last_response.should be_ok
-    #last_response.body.should have_content("session:")
-    #last_response.body.should have_content("user:")
+    last_response.body.should include "session:"
+    last_response.body.should include "user:"
   end
 
   it "should login error" do
 
     get "/login"
-    #last_response.should be_ok
+    last_response.should be_ok
     last_response.body.should include "ret:400, msg:"
   end
   

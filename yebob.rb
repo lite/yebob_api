@@ -23,8 +23,10 @@ configure :development do
 end
 
 get '/login' do
-  'ret:400, msg:test'
+  return 'session: test; user:test' if params.include?("code")
+  return 'ret:400, msg:test' 
 end
+
 
 get '/api/:gameId' do 
   request.body.rewind  # in case someone already read it
