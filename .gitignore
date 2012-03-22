@@ -1,4 +1,4 @@
 *.bak
 *.stackdump
 *.lock
-*.swp
+*.sw*
