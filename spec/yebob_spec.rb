@@ -1,5 +1,5 @@
 require 'rubygems'
-require './spec_helper.rb'
+require_relative './spec_helper.rb'
 
 describe 'Yebob API' do
   include Rack::Test::Methods
@@ -48,19 +48,114 @@ describe 'Yebob API' do
   end
 
   # logout
-  fake_ss = {"access_token" => 'test', "session" => 'test'}
+  fake_headers = {"HTTP_ACCESS_TOKEN" => 'test', "HTTP_SESSION" => 'test'}
   it "should logout pass" do
-    get "/logout",  {}, "rack.session" => fake_ss
+    get "/logout",  {}, fake_headers
     last_response.should be_ok
     last_response.body.should be_empty
   end
 
-it "should logout return error" do
+  it "should logout return error" do
     get "/logout"
     last_response.should be_ok
     obj = get_obj(last_response)
     obj["ret"].should == 400 
     obj["msg"].should_not be nil
   end
-  
+
+  # me
+  it "should me pass" do
+    get "/me",  {}, fake_headers
+    last_response.should be_ok
+    obj = get_obj(last_response)
+    obj["id"].should_not be nil
+    obj["community"].should_not be nil
+    obj["name"].should_not be nil
+  end
+
+  it "should me return error" do
+    get "/me"
+    last_response.should be_ok
+    obj = get_obj(last_response)
+    obj["ret"].should == 400 
+    obj["msg"].should_not be nil
+  end
+
+  # share
+  it "should share pass" do
+    get "/share",  {:text=>"***"}, fake_headers
+    last_response.should be_ok
+    obj = get_obj(last_response)
+    obj["ret"].should == 0
+  end
+
+  it "should share return error" do
+    get "/share"
+    last_response.should be_ok
+    obj = get_obj(last_response)
+    obj["ret"].should == 400 
+    obj["msg"].should_not be nil
+  end
+
+  # score submit
+  it "should score submit pass" do
+    get "/score/submit",  {:list_id=>"***", :score=>"***"}, fake_headers
+    last_response.should be_ok
+    obj = get_obj(last_response)
+    obj["ret"].should == 0
+  end
+
+  it "should score submit return error" do
+    get "/score/submit"
+    last_response.should be_ok
+    obj = get_obj(last_response)
+    obj["ret"].should == 400 
+    obj["msg"].should_not be nil
+  end
+
+  # ranking lists 
+  it "should ranking lists pass" do
+    get "/ranking/lists",  {}, fake_headers
+    last_response.should be_ok
+    obj = get_obj(last_response)
+    obj["total"].should > 0
+    obj["lists"].should_not be nil
+    last_list = obj["lists"][-1]
+    last_list.should_not be nil
+    last_list["id"].should_not be nil
+    last_list["name"].should_not be nil
+  end
+
+  it "should ranking lists return error" do
+    get "/ranking/lists"
+    last_response.should be_ok
+    obj = get_obj(last_response)
+    obj["ret"].should == 400 
+    obj["msg"].should_not be nil
+  end
+
+  # ranking tops
+  it "should ranking tops pass" do
+    get "/ranking/tops",  {:list_id=>"test", :count=>10, :start=>0, :period=>"week", :zone=>"friends"}, fake_headers
+    last_response.should be_ok
+    obj = get_obj(last_response)
+    obj["total"].should > 0
+    obj["items"].should_not be nil
+    obj["index"].should > 0
+    last_item = obj["items"][-1]
+    last_item.should_not be nil
+    last_item["id"].should_not be nil
+    last_item["user"].should_not be nil
+    last_item["score"].should_not be nil
+  end
+
+  it "should ranking tops return error" do
+    get "/ranking/tops"
+    last_response.should be_ok
+    obj = get_obj(last_response)
+    obj["ret"].should == 400 
+    obj["msg"].should_not be nil
+  end
+
+
 end 

@@ -72,11 +72,54 @@ get '/login' do
 end
 
 get '/logout' do
-  p session.inspect
-  if session["access_token"].nil?
+  if request_headers["access_token"].nil? 
     return {:ret=>400, :msg => 'test'}.to_json
   end
   session.clear
+end
+
+get '/me' do
+  if request_headers["access_token"].nil? 
+    return {:ret=>400, :msg => 'test'}.to_json
+  end
+  return {:id=>"test", :community=>"test", :name=>"test"}.to_json
+end
+
+get '/share' do
+  if not params.include?("text") 
+    return {:ret=>400, :msg => 'test'}.to_json
+  end
+  return {:ret=>0}.to_json
+end
+
+get '/score/submit' do
+  if not params.include?("list_id") 
+    return {:ret=>400, :msg => 'test'}.to_json
+  end
+  return {:ret=>0}.to_json
+end
+
+get '/ranking/lists' do
+  if request_headers["access_token"].nil? 
+    return {:ret=>400, :msg => 'test'}.to_json
+  end
+  lists = [{:id=>1, :name=>"test1"}, {:id=>2, :name=>"test2"}]
+  return {:total=>1, :lists=>lists}.to_json
+end
+
+get '/ranking/tops' do
+  if not params.include?("list_id") 
+    return {:ret=>400, :msg => 'test'}.to_json
+  end
+  items = [{:id=>1, :user=>"test1", :score=>100}, {:id=>2, :user=>"test2", :score=>99}]
+  return {:total=>45, :items=>items, :index=>10}.to_json
+end
+
+# get request header
+helpers do
+  def request_headers
+    env.inject({}){|acc, (k,v)| acc[$1.downcase] = v if k =~ /^http_(.*)/i; acc}
+  end
 end
 
 # will change
