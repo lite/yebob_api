@@ -157,5 +157,37 @@ describe 'Yebob API' do
     obj["msg"].should_not be nil
   end
 
+  # status get
+  it "should status get pass" do
+    get "/status/get",  {}, fake_headers
+    last_response.should be_ok
+    obj = get_obj(last_response)
+    obj["state"].should >= 0
+    obj["expires_in"].should >= 0
+  end
+
+  it "should status get return error" do
+    get "/status/get"
+    last_response.should be_ok
+    obj = get_obj(last_response)
+    obj["ret"].should == 400 
+    obj["msg"].should_not be nil
+  end
+
+  # status exists
+  it "should status exists pass" do
+    get "/status/exists",  {:state=>1, :delete=>1}, fake_headers
+    last_response.should be_ok
+    obj = get_obj(last_response)
+    obj["ret"].should >= 0
+  end
+
+  it "should status exists return error" do
+    get "/status/exists"
+    last_response.should be_ok
+    obj = get_obj(last_response)
+    obj["ret"].should == 400 
+    obj["msg"].should_not be nil
+  end
 
 end 

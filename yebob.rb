@@ -115,6 +115,20 @@ get '/ranking/tops' do
   return {:total=>45, :items=>items, :index=>10}.to_json
 end
 
+get '/status/get' do
+  if request_headers["access_token"].nil? 
+    return {:ret=>400, :msg => 'test'}.to_json
+  end
+  return {:state=>1, :expires_in=>3600*24*7}.to_json
+end
+
+get '/status/exists' do
+  if request_headers["access_token"].nil? 
+    return {:ret=>400, :msg => 'test'}.to_json
+  end
+  return {:ret=>0}.to_json
+end
+
 # get request header
 helpers do
   def request_headers
