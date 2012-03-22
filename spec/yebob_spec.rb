@@ -1,4 +1,5 @@
-require_relative 'spec_helper.rb'
+require 'rubygems'
+require './spec_helper.rb'
 
 describe 'Yebob API' do
   include Rack::Test::Methods
